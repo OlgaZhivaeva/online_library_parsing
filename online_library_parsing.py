@@ -108,7 +108,7 @@ def parse_book_page(book_id):
 
 def main():
     args = get_start_and_end_book()
-    for book_id in range(args.start_id, args.end_id):
+    for book_id in range(args.start_id, args.end_id+1):
         book_url = f'https://tululu.org/txt.php?id={book_id}'
         book_page_dict = parse_book_page(book_id)
         if book_page_dict:
