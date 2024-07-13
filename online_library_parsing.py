@@ -41,8 +41,8 @@ def download_txt(url, filename, folder='books/'):
         check_for_redirect(response)
     except HTTPError:
         return
-    # with open(path_to_file, 'w', encoding="UTF-8") as book:
-    #     book.write(response.text)
+    with open(path_to_file, 'w', encoding="UTF-8") as book:
+        book.write(response.text)
     return path_to_file
 
 
@@ -64,8 +64,8 @@ def download_image(url, imagename, folder='images/'):
         check_for_redirect(response)
     except HTTPError:
         return
-    # with open(path_to_image, 'wb') as image:
-    #     image.write(response.content)
+    with open(path_to_image, 'wb') as image:
+        image.write(response.content)
     return path_to_image
 
 
