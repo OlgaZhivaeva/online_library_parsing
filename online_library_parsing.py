@@ -1,3 +1,4 @@
+import argparse
 import os
 import requests
 from requests import HTTPError
@@ -6,6 +7,15 @@ from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
 from urllib.parse import unquote
+
+
+def get_start_and_end_book():
+    """Получить id первой и последней книги для скачивания."""
+    parser = argparse.ArgumentParser(description='Скачивание книг с сайта tululu.org')
+    parser.add_argument('-s', '--start_id', type=int, default=1, help='id первой книги для скачивания')
+    parser.add_argument('-e', '--end_id', type=int, default=11, help='id последней книги для скачивания')
+    args = parser.parse_args()
+    return args
 
 
 def check_for_redirect(response):
@@ -31,8 +41,8 @@ def download_txt(url, filename, folder='books/'):
         check_for_redirect(response)
     except HTTPError:
         return
-    with open(path_to_file, 'w', encoding="UTF-8") as book:
-        book.write(response.text)
+    # with open(path_to_file, 'w', encoding="UTF-8") as book:
+    #     book.write(response.text)
     return path_to_file
 
 
@@ -54,8 +64,8 @@ def download_image(url, imagename, folder='images/'):
         check_for_redirect(response)
     except HTTPError:
         return
-    with open(path_to_image, 'wb') as image:
-        image.write(response.content)
+    # with open(path_to_image, 'wb') as image:
+    #     image.write(response.content)
     return path_to_image
 
 
@@ -97,7 +107,8 @@ def parse_book_page(book_id):
 
 
 def main():
-    for book_id in range(1, 11):
+    args = get_start_and_end_book()
+    for book_id in range(args.start_id, args.end_id):
         book_url = f'https://tululu.org/txt.php?id={book_id}'
         book_page_dict = parse_book_page(book_id)
         if book_page_dict:
