@@ -73,14 +73,17 @@ def parse_book_page(book_id):
     split_text = title_text.split('::')
     book_title = split_text[0].strip()
     filename = f'{book_id}. {book_title}'
+    print(f'название: {filename}')
     book_author = split_text[1].strip()
     image_src = soup.find('div', class_='bookimage').find('img')['src']
     image_url = urljoin('https://tululu.org/', image_src)
     imagename = unquote(image_src, encoding='utf-8', errors='replace').split('/')[-1]
-    book_comments_tag = soup.find_all('div', class_='texts')
-    print(f'название: {filename}')
-    for comment in book_comments_tag:
-        print(comment.find('span', class_='black').text)
+    book_genres = soup.find('span', class_='d_book').find_all('a')
+    for genre in book_genres:
+                print(genre.text)
+    # book_comments_tag = soup.find_all('div', class_='texts')
+    # for comment in book_comments_tag:
+    #     print(comment.find('span', class_='black').text)
 
     return {
         'book_author': book_author,
