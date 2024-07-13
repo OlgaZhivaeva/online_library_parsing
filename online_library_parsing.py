@@ -31,8 +31,8 @@ def download_txt(url, filename, folder='books/'):
         check_for_redirect(response)
     except HTTPError:
         return
-    with open(path_to_file, 'w', encoding="UTF-8") as book:
-        book.write(response.text)
+    # with open(path_to_file, 'w', encoding="UTF-8") as book:
+    #     book.write(response.text)
     return path_to_file
 
 
@@ -54,8 +54,8 @@ def download_image(url, imagename, folder='images/'):
         check_for_redirect(response)
     except HTTPError:
         return
-    with open(path_to_image, 'wb') as image:
-        image.write(response.content)
+    # with open(path_to_image, 'wb') as image:
+    #     image.write(response.content)
     return path_to_image
 
 
@@ -77,6 +77,11 @@ def parse_book_page(book_id):
     image_src = soup.find('div', class_='bookimage').find('img')['src']
     image_url = urljoin('https://tululu.org/', image_src)
     imagename = unquote(image_src, encoding='utf-8', errors='replace').split('/')[-1]
+    book_comments_tag = soup.find_all('div', class_='texts')
+    print(f'название: {filename}')
+    for comment in book_comments_tag:
+        print(comment.find('span', class_='black').text)
+
     return {
         'book_author': book_author,
         'filename': filename,
@@ -93,7 +98,6 @@ def main():
             book_name = book_page_dict['filename']
             book_imag = book_page_dict['imagename']
             image_url = book_page_dict['image_url']
-            print(book_page_dict)
             download_txt(book_url, book_name)
             download_image(image_url, book_imag)
 
