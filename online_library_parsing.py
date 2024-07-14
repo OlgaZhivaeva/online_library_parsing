@@ -23,10 +23,11 @@ def check_for_redirect(response):
         raise HTTPError
 
 
-def download_txt(url, filename, folder='books/'):
+def download_txt(url, params, filename, folder='books/'):
     """Функция для скачивания текстовых файлов.
     Args:
         url (str): Cсылка на текст, который хочется скачать.
+        params (dict): Параметры GET запроса для передачи id файла.
         filename (str): Имя файла, с которым сохранять.
         folder (str): Папка, куда сохранять.
     Returns:
@@ -35,7 +36,7 @@ def download_txt(url, filename, folder='books/'):
     san_filename = sanitize_filename(filename)
     Path(folder).mkdir(parents=True, exist_ok=True)
     path_to_file = f'{os.path.join(folder, san_filename)}.txt'
-    response = requests.get(url)
+    response = requests.get(url, params=params)
     response.raise_for_status()
     try:
         check_for_redirect(response)
@@ -109,13 +110,14 @@ def parse_book_page(book_id):
 def main():
     args = get_start_and_end_book()
     for book_id in range(args.start_id, args.end_id+1):
-        book_url = f'https://tululu.org/txt.php?id={book_id}'
+        params = {'id': book_id}
+        book_url = f'https://tululu.org/txt.php'
         book_page_dict = parse_book_page(book_id)
         if book_page_dict:
             book_name = book_page_dict['filename']
             book_image = book_page_dict['imagename']
             image_url = book_page_dict['image_url']
-            download_txt(book_url, book_name)
+            download_txt(book_url, params, book_name)
             download_image(image_url, book_image)
             print(f"Заголовок: {book_page_dict['book_title']}")
             print(book_page_dict['book_genres'])
