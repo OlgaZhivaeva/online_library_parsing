@@ -85,7 +85,7 @@ def parse_book_page(page_url, book_id):
     filename = f'{book_id}. {book_title}'
     book_author = split_text[1].strip()
     image_src = soup.find('div', class_='bookimage').find('img')['src']
-    image_url = urljoin('https://tululu.org/', image_src)
+    image_url = urljoin(page_url, image_src)
     imagename = unquote(image_src, encoding='utf-8', errors='replace').split('/')[-1]
     book_genres_tag = soup.find('span', class_='d_book').find_all('a')
     book_genres = []
