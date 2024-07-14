@@ -13,7 +13,7 @@ def get_start_and_end_book():
     """Получить id первой и последней книги для скачивания."""
     parser = argparse.ArgumentParser(description='Скачивание книг с сайта tululu.org')
     parser.add_argument('-s', '--start_id', type=int, default=1, help='id первой книги для скачивания')
-    parser.add_argument('-e', '--end_id', type=int, default=11, help='id последней книги для скачивания')
+    parser.add_argument('-e', '--end_id', type=int, default=10, help='id последней книги для скачивания')
     args = parser.parse_args()
     return args
 
@@ -38,10 +38,7 @@ def download_txt(url, params, filename, folder='books/'):
     path_to_file = f'{os.path.join(folder, san_filename)}.txt'
     response = requests.get(url, params=params)
     response.raise_for_status()
-    try:
-        check_for_redirect(response)
-    except HTTPError:
-        return
+    check_for_redirect(response)
     with open(path_to_file, 'w', encoding="UTF-8") as book:
         book.write(response.text)
     return path_to_file
@@ -61,10 +58,7 @@ def download_image(url, imagename, folder='images/'):
     path_to_image = f'{os.path.join(folder, san_imagename)}'
     response = requests.get(url)
     response.raise_for_status()
-    try:
-        check_for_redirect(response)
-    except HTTPError:
-        return
+    check_for_redirect(response)
     with open(path_to_image, 'wb') as image:
         image.write(response.content)
     return path_to_image
@@ -73,10 +67,7 @@ def download_image(url, imagename, folder='images/'):
 def parse_book_page(page_url, book_id):
     response = requests.get(page_url)
     response.raise_for_status()
-    try:
-        check_for_redirect(response)
-    except HTTPError:
-        return
+    check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find('table', class_='tabs').find('h1')
     title_text = title_tag.text
@@ -108,16 +99,23 @@ def main():
         params = {'id': book_id}
         book_url = f'https://tululu.org/txt.php'
         page_url = f'https://tululu.org/b{book_id}/'
-        book_page_parse = parse_book_page(page_url, book_id)
-        if book_page_parse:
+        try:
+            book_page_parse = parse_book_page(page_url, book_id)
             book_name = book_page_parse['filename']
             book_image = book_page_parse['imagename']
             image_url = book_page_parse['image_url']
-            download_txt(book_url, params, book_name)
-            download_image(image_url, book_image)
+            try:
+                download_txt(book_url, params, book_name)
+            except HTTPError:
+                pass
+            try:
+                download_image(image_url, book_image)
+            except HTTPError:
+                pass
             print(f"Заголовок: {book_page_parse['book_title']}")
             print(book_page_parse['book_genres'])
-
+        except HTTPError:
+            pass
 
 if __name__ == "__main__":
     main()
