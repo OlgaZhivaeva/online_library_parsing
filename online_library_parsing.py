@@ -88,13 +88,9 @@ def parse_book_page(page_url, book_id):
     image_url = urljoin(page_url, image_src)
     imagename = unquote(image_src, encoding='utf-8', errors='replace').split('/')[-1]
     book_genres_tag = soup.find('span', class_='d_book').find_all('a')
-    book_genres = []
-    for genre in book_genres_tag:
-        book_genres.append(genre.text)
+    book_genres = [genre.text for genre in book_genres_tag]
     book_comments_tag = soup.find_all('div', class_='texts')
-    book_comments = []
-    for comment in book_comments_tag:
-        book_comments.append(comment.find('span', class_='black').text)
+    book_comments = [comment.find('span', class_='black').text for comment in book_comments_tag]
     return {
         'book_title': book_title,
         'book_author': book_author,
