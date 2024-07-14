@@ -70,9 +70,8 @@ def download_image(url, imagename, folder='images/'):
     return path_to_image
 
 
-def parse_book_page(book_id):
-    url = f'https://tululu.org/b{book_id}/'
-    response = requests.get(url)
+def parse_book_page(page_url, book_id):
+    response = requests.get(page_url)
     response.raise_for_status()
     try:
         check_for_redirect(response)
@@ -112,7 +111,8 @@ def main():
     for book_id in range(args.start_id, args.end_id+1):
         params = {'id': book_id}
         book_url = f'https://tululu.org/txt.php'
-        book_page_parse = parse_book_page(book_id)
+        page_url = f'https://tululu.org/b{book_id}/'
+        book_page_parse = parse_book_page(page_url, book_id)
         if book_page_parse:
             book_name = book_page_parse['filename']
             book_image = book_page_parse['imagename']
