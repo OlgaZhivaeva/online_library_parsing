@@ -112,15 +112,15 @@ def main():
     for book_id in range(args.start_id, args.end_id+1):
         params = {'id': book_id}
         book_url = f'https://tululu.org/txt.php'
-        book_page_dict = parse_book_page(book_id)
-        if book_page_dict:
-            book_name = book_page_dict['filename']
-            book_image = book_page_dict['imagename']
-            image_url = book_page_dict['image_url']
+        book_page_parse = parse_book_page(book_id)
+        if book_page_parse:
+            book_name = book_page_parse['filename']
+            book_image = book_page_parse['imagename']
+            image_url = book_page_parse['image_url']
             download_txt(book_url, params, book_name)
             download_image(image_url, book_image)
-            print(f"Заголовок: {book_page_dict['book_title']}")
-            print(book_page_dict['book_genres'])
+            print(f"Заголовок: {book_page_parse['book_title']}")
+            print(book_page_parse['book_genres'])
 
 
 if __name__ == "__main__":
