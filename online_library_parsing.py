@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 import requests
 from requests import HTTPError
 from pathlib import Path
@@ -36,11 +37,11 @@ def download_txt(url, params, filename, folder='books/'):
     san_filename = sanitize_filename(filename)
     Path(folder).mkdir(parents=True, exist_ok=True)
     path_to_file = f'{os.path.join(folder, san_filename)}.txt'
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=60)
     response.raise_for_status()
     check_for_redirect(response)
-    with open(path_to_file, 'w', encoding="UTF-8") as book:
-        book.write(response.text)
+    # with open(path_to_file, 'w', encoding="UTF-8") as book:
+    #     book.write(response.text)
     return path_to_file
 
 
@@ -56,16 +57,16 @@ def download_image(url, imagename, folder='images/'):
     san_imagename = sanitize_filename(imagename)
     Path(folder).mkdir(parents=True, exist_ok=True)
     path_to_image = f'{os.path.join(folder, san_imagename)}'
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
     response.raise_for_status()
     check_for_redirect(response)
-    with open(path_to_image, 'wb') as image:
-        image.write(response.content)
+    # with open(path_to_image, 'wb') as image:
+    #     image.write(response.content)
     return path_to_image
 
 
 def parse_book_page(page_url, book_id):
-    response = requests.get(page_url)
+    response = requests.get(page_url, timeout=60)
     response.raise_for_status()
     check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
@@ -97,7 +98,7 @@ def main():
     args = get_start_and_end_book()
     for book_id in range(args.start_id, args.end_id+1):
         params = {'id': book_id}
-        book_url = f'https://tululu.org/txt.php'
+        book_url = 'https://tululu.org/txt.php'
         page_url = f'https://tululu.org/b{book_id}/'
         try:
             book_page_parse = parse_book_page(page_url, book_id)
@@ -106,16 +107,35 @@ def main():
             image_url = book_page_parse['image_url']
             try:
                 download_txt(book_url, params, book_name)
-            except HTTPError:
-                pass
+            except requests.exceptions.HTTPError:
+                print(f'Книги id {book_id} нет')
+            except requests.exceptions.ConnectionError:
+                print('Ошибка соединения download_txt')
+                time.sleep(20)
+            except requests.exceptions.ReadTimeout:
+                print(f'Ошибка соединения download_txt timeout')
+                time.sleep(20)
             try:
                 download_image(image_url, book_image)
-            except HTTPError:
-                pass
+            except requests.exceptions.HTTPError:
+                print(f'Обложки книги id {book_id} нет')
+            except requests.exceptions.ConnectionError:
+                print('Ошибка соединения download_image')
+                time.sleep(20)
+            except requests.exceptions.ReadTimeout:
+                print(f'Ошибка соединения download_image timeout')
+                time.sleep(20)
             print(f"Заголовок: {book_page_parse['book_title']}")
             print(book_page_parse['book_genres'])
-        except HTTPError:
-            pass
+        except requests.exceptions.HTTPError:
+            print(f'Страницы книги id {book_id} нет')
+        except requests.exceptions.ConnectionError:
+            print('Ошибка соединения parse_book_page')
+            time.sleep(20)
+        except requests.exceptions.ReadTimeout:
+            print(f'Ошибка соединения parse_book_page timeout')
+            time.sleep(20)
+
 
 if __name__ == "__main__":
     main()
