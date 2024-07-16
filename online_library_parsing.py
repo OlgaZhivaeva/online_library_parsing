@@ -105,10 +105,10 @@ def main():
         page_url = f'https://tululu.org/b{book_id}/'
         try:
             response = get_page(page_url)
-            book_page_parse = parse_book_page(response, book_id)
-            book_name = book_page_parse['filename']
-            book_image = book_page_parse['imagename']
-            image_url = book_page_parse['image_url']
+            book = parse_book_page(response, book_id)
+            book_name = book['filename']
+            book_image = book['imagename']
+            image_url = book['image_url']
             try:
                 download_txt(book_url, params, book_name)
             except requests.exceptions.HTTPError:
