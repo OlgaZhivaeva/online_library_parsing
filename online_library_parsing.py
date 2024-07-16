@@ -20,8 +20,17 @@ def get_start_and_end_book():
 
 
 def check_for_redirect(response):
+    """Проверить на редирект."""
     if response.history:
         raise HTTPError
+
+
+def get_page(url, params=None):
+    """Получить страницу по URL."""
+    response = requests.get(url, params=params, timeout=60)
+    response.raise_for_status()
+    check_for_redirect(response)
+    return response
 
 
 def download_txt(url, params, filename, folder='books/'):
@@ -37,11 +46,9 @@ def download_txt(url, params, filename, folder='books/'):
     san_filename = sanitize_filename(filename)
     Path(folder).mkdir(parents=True, exist_ok=True)
     path_to_file = f'{os.path.join(folder, san_filename)}.txt'
-    response = requests.get(url, params=params, timeout=60)
-    response.raise_for_status()
-    check_for_redirect(response)
-    # with open(path_to_file, 'w', encoding="UTF-8") as book:
-    #     book.write(response.text)
+    response = get_page(url, params=params)
+    with open(path_to_file, 'w', encoding="UTF-8") as book:
+        book.write(response.text)
     return path_to_file
 
 
@@ -57,18 +64,14 @@ def download_image(url, imagename, folder='images/'):
     san_imagename = sanitize_filename(imagename)
     Path(folder).mkdir(parents=True, exist_ok=True)
     path_to_image = f'{os.path.join(folder, san_imagename)}'
-    response = requests.get(url, timeout=60)
-    response.raise_for_status()
-    check_for_redirect(response)
-    # with open(path_to_image, 'wb') as image:
-    #     image.write(response.content)
+    response = get_page(url)
+    with open(path_to_image, 'wb') as image:
+        image.write(response.content)
     return path_to_image
 
 
-def parse_book_page(page_url, book_id):
-    response = requests.get(page_url, timeout=60)
-    response.raise_for_status()
-    check_for_redirect(response)
+def parse_book_page(response, book_id):
+    """Получить данные со страницы книги."""
     soup = BeautifulSoup(response.text, 'lxml')
     title_tag = soup.find('table', class_='tabs').find('h1')
     title_text = title_tag.text
@@ -77,7 +80,7 @@ def parse_book_page(page_url, book_id):
     filename = f'{book_id}. {book_title}'
     book_author = split_text[1].strip()
     image_src = soup.find('div', class_='bookimage').find('img')['src']
-    image_url = urljoin(page_url, image_src)
+    image_url = urljoin(f'https://tululu.org/b{book_id}/', image_src)
     imagename = unquote(image_src, encoding='utf-8', errors='replace').split('/')[-1]
     book_genres_tag = soup.find('span', class_='d_book').find_all('a')
     book_genres = [genre.text for genre in book_genres_tag]
@@ -101,7 +104,8 @@ def main():
         book_url = 'https://tululu.org/txt.php'
         page_url = f'https://tululu.org/b{book_id}/'
         try:
-            book_page_parse = parse_book_page(page_url, book_id)
+            response = get_page(page_url)
+            book_page_parse = parse_book_page(response, book_id)
             book_name = book_page_parse['filename']
             book_image = book_page_parse['imagename']
             image_url = book_page_parse['image_url']
