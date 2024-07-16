@@ -1,6 +1,6 @@
 # Parser of books from the site [https://tululu.org/](https://tululu.org/)
 
-The project is designed to download books from the website tululu.org.
+The project is designed to download books from the website [https://tululu.org/](https://tululu.org/).
 
 ### How to install
 
