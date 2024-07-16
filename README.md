@@ -1,4 +1,4 @@
-# Parser of books from the site [tululu.org](https://tululu.org/)
+# Parser of books from the site [https://tululu.org/](https://tululu.org/)
 
 The project is designed to download books from the website tululu.org.
 
