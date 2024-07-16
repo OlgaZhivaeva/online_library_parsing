@@ -106,6 +106,15 @@ def main():
         try:
             response = get_page(page_url)
             book = parse_book_page(response, book_id)
+        except requests.exceptions.HTTPError:
+            print(f'Страницы книги id {book_id} нет')
+        except requests.exceptions.ConnectionError:
+            print('Ошибка соединения parse_book_page')
+            time.sleep(20)
+        except requests.exceptions.ReadTimeout:
+            print(f'Ошибка соединения parse_book_page timeout')
+            time.sleep(20)
+        else:
             book_name = book['filename']
             book_image = book['imagename']
             image_url = book['image_url']
@@ -129,16 +138,8 @@ def main():
             except requests.exceptions.ReadTimeout:
                 print(f'Ошибка соединения download_image timeout')
                 time.sleep(20)
-            print(f"Заголовок: {book_page_parse['book_title']}")
-            print(book_page_parse['book_genres'])
-        except requests.exceptions.HTTPError:
-            print(f'Страницы книги id {book_id} нет')
-        except requests.exceptions.ConnectionError:
-            print('Ошибка соединения parse_book_page')
-            time.sleep(20)
-        except requests.exceptions.ReadTimeout:
-            print(f'Ошибка соединения parse_book_page timeout')
-            time.sleep(20)
+            print(f"Заголовок: {book['book_title']}")
+            print(book['book_genres'])
 
 
 if __name__ == "__main__":
