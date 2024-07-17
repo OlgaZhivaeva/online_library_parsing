@@ -10,7 +10,7 @@ from urllib.parse import urljoin
 from urllib.parse import unquote
 
 
-def get_start_and_end_book():
+def get_args():
     """Получить id первой и последней книги для скачивания."""
     parser = argparse.ArgumentParser(description='Скачивание книг с сайта tululu.org')
     parser.add_argument('-s', '--start_id', type=int, default=1, help='id первой книги для скачивания')
@@ -98,7 +98,7 @@ def parse_book_page(response, book_id):
 
 
 def main():
-    args = get_start_and_end_book()
+    args = get_args()
     for book_id in range(args.start_id, args.end_id+1):
         params = {'id': book_id}
         book_url = 'https://tululu.org/txt.php'
