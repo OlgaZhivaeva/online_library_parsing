@@ -97,6 +97,51 @@ def parse_book_page(response, book_id):
     }
 
 
+# def main():
+#     args = get_args()
+#     for book_id in range(args.start_id, args.end_id+1):
+#         params = {'id': book_id}
+#         book_url = 'https://tululu.org/txt.php'
+#         page_url = f'https://tululu.org/b{book_id}/'
+#         try:
+#             response = get_page(page_url)
+#             book = parse_book_page(response, book_id)
+#         except requests.exceptions.HTTPError:
+#             print(f'Страницы книги id {book_id} нет')
+#         except requests.exceptions.ConnectionError:
+#             print('Ошибка соединения parse_book_page')
+#             time.sleep(20)
+#         except requests.exceptions.ReadTimeout:
+#             print(f'Ошибка соединения parse_book_page timeout')
+#             time.sleep(20)
+#         else:
+#             book_name = book['filename']
+#             book_image = book['imagename']
+#             image_url = book['image_url']
+#             try:
+#                 download_txt(book_url, params, book_name)
+#             except requests.exceptions.HTTPError:
+#                 print(f'Книги id {book_id} нет')
+#             except requests.exceptions.ConnectionError:
+#                 print('Ошибка соединения download_txt')
+#                 time.sleep(20)
+#             except requests.exceptions.ReadTimeout:
+#                 print(f'Ошибка соединения download_txt timeout')
+#                 time.sleep(20)
+#             try:
+#                 download_image(image_url, book_image)
+#             except requests.exceptions.HTTPError:
+#                 print(f'Обложки книги id {book_id} нет')
+#             except requests.exceptions.ConnectionError:
+#                 print('Ошибка соединения download_image')
+#                 time.sleep(20)
+#             except requests.exceptions.ReadTimeout:
+#                 print(f'Ошибка соединения download_image timeout')
+#                 time.sleep(20)
+#             print(f"Заголовок: {book['book_title']}")
+#             print(book['book_genres'])
+
+
 def main():
     args = get_args()
     for book_id in range(args.start_id, args.end_id+1):
@@ -106,40 +151,22 @@ def main():
         try:
             response = get_page(page_url)
             book = parse_book_page(response, book_id)
-        except requests.exceptions.HTTPError:
-            print(f'Страницы книги id {book_id} нет')
-        except requests.exceptions.ConnectionError:
-            print('Ошибка соединения parse_book_page')
-            time.sleep(20)
-        except requests.exceptions.ReadTimeout:
-            print(f'Ошибка соединения parse_book_page timeout')
-            time.sleep(20)
-        else:
             book_name = book['filename']
             book_image = book['imagename']
             image_url = book['image_url']
-            try:
-                download_txt(book_url, params, book_name)
-            except requests.exceptions.HTTPError:
-                print(f'Книги id {book_id} нет')
-            except requests.exceptions.ConnectionError:
-                print('Ошибка соединения download_txt')
-                time.sleep(20)
-            except requests.exceptions.ReadTimeout:
-                print(f'Ошибка соединения download_txt timeout')
-                time.sleep(20)
-            try:
-                download_image(image_url, book_image)
-            except requests.exceptions.HTTPError:
-                print(f'Обложки книги id {book_id} нет')
-            except requests.exceptions.ConnectionError:
-                print('Ошибка соединения download_image')
-                time.sleep(20)
-            except requests.exceptions.ReadTimeout:
-                print(f'Ошибка соединения download_image timeout')
-                time.sleep(20)
-            print(f"Заголовок: {book['book_title']}")
-            print(book['book_genres'])
+            download_txt(book_url, params, book_name)
+            download_image(image_url, book_image)
+        except requests.exceptions.HTTPError:
+            print(f'id {book_id} ошибка скачивания')
+        except requests.exceptions.ConnectionError:
+            print('Соединение не установлено')
+            time.sleep(20)
+        except requests.exceptions.ReadTimeout:
+            print(f'Время ожидания соединения истекло')
+            time.sleep(20)
+
+        print(f"Заголовок: {book['book_title']}")
+        print(book['book_genres'])
 
 
 if __name__ == "__main__":
