@@ -59,7 +59,7 @@ def download_image(url, imagename, folder='images/'):
         imagename (str): Имя файла, с которым сохранять.
         folder (str): Папка, куда сохранять.
     Returns:
-        str: Путь до файла, куда сохранён текст.
+        str: Путь до файла, куда сохранёна картинка.
     """
     san_imagename = sanitize_filename(imagename)
     Path(folder).mkdir(parents=True, exist_ok=True)
